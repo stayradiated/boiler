@@ -37,8 +37,7 @@ gulp.task('lib', function () {
     console.log('rebundling');
     return bundler.bundle()
       .on('error', function (err) {
-        console.log(err);
-        throw err;
+        console.log(err.message);
       })
       .pipe(source('main.js'))
       .pipe(gulp.dest('./dist/js'))
