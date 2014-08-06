@@ -15,20 +15,108 @@ if (typeof window !== 'undefined') {
   window.React = React;
 }
 
-},{"./components/app.react":"/Volumes/Home/Projects/boiler/web_app/lib/components/app.react.jsx","fastclick":"/Volumes/Home/Projects/boiler/web_app/node_modules/fastclick/lib/fastclick.js","jquery":"/Volumes/Home/Projects/boiler/web_app/node_modules/jquery/dist/jquery.js","react":"/Volumes/Home/Projects/boiler/web_app/node_modules/react/react.js"}],"/Volumes/Home/Projects/boiler/web_app/lib/components/app.react.jsx":[function(require,module,exports){
+},{"./components/app.react":"/Volumes/Home/Projects/boiler/web_app/lib/components/app.react.jsx","fastclick":"/Volumes/Home/Projects/boiler/web_app/node_modules/fastclick/lib/fastclick.js","jquery":"/Volumes/Home/Projects/boiler/web_app/node_modules/jquery/dist/jquery.js","react":"/Volumes/Home/Projects/boiler/web_app/node_modules/react/react.js"}],"/Volumes/Home/Projects/boiler/web_app/lib/actions.js":[function(require,module,exports){
+var Reflux = require('reflux');
+
+var actions = Reflux.createActions([
+  'changeName'
+]);
+
+module.exports = actions;
+
+
+},{"reflux":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/index.js"}],"/Volumes/Home/Projects/boiler/web_app/lib/components/app.react.jsx":[function(require,module,exports){
 /** @jsx React.DOM */var React = require('react');
+var Reflux = require('reflux');
+
+var appStore = require('../stores/app');
+var Header = require('./header.react');
 
 var App = React.createClass({displayName: 'App',
 
+  mixins: [Reflux.ListenerMixin],
+
+  componentDidMount: function () {
+    this.listenTo(appStore, this.onChange);
+  },
+
+  onChange: function () {
+    this.forceUpdate();
+  },
+
   render: function () {
-    return null;
+    /* jshint ignore: start */
+    return (
+      React.DOM.div({className: "app"}, 
+        Header(null)
+      )
+    );
+    /* jshint ignore: end */
   }
 
 });
 
 module.exports = App;
 
-},{"react":"/Volumes/Home/Projects/boiler/web_app/node_modules/react/react.js"}],"/Volumes/Home/Projects/boiler/web_app/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
+},{"../stores/app":"/Volumes/Home/Projects/boiler/web_app/lib/stores/app.js","./header.react":"/Volumes/Home/Projects/boiler/web_app/lib/components/header.react.jsx","react":"/Volumes/Home/Projects/boiler/web_app/node_modules/react/react.js","reflux":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/index.js"}],"/Volumes/Home/Projects/boiler/web_app/lib/components/header.react.jsx":[function(require,module,exports){
+/** @jsx React.DOM */var React = require('react');
+
+var actions = require('../actions');
+var appStore = require('../stores/app');
+
+var Header = React.createClass({displayName: 'Header',
+
+  changeName: function () {
+    var name = window.prompt('Enter a name');
+    actions.changeName(name);
+  },
+
+  render: function () {
+    /* jshint ignore: start */
+    return (
+      React.DOM.header(null, 
+        React.DOM.h1(null, appStore.getName()), 
+        React.DOM.button({onClick: this.changeName}, 
+          "Change Name"
+        )
+      )
+    );
+    /* jshint ignore: end */
+  }
+
+});
+
+module.exports = Header;
+
+},{"../actions":"/Volumes/Home/Projects/boiler/web_app/lib/actions.js","../stores/app":"/Volumes/Home/Projects/boiler/web_app/lib/stores/app.js","react":"/Volumes/Home/Projects/boiler/web_app/node_modules/react/react.js"}],"/Volumes/Home/Projects/boiler/web_app/lib/stores/app.js":[function(require,module,exports){
+var Reflux = require('reflux');
+
+var actions = require('../actions');
+
+var state = {
+  name: 'Boiler: Web App'
+};
+
+var appStore = Reflux.createStore({
+
+  init: function () {
+    this.listenTo(actions.changeName, this.changeName);
+  },
+
+  changeName: function (name) {
+    state.name = name;
+    this.trigger(state);
+  },
+
+  getName: function () {
+    return state.name;
+  }
+
+});
+
+module.exports = appStore;
+
+},{"../actions":"/Volumes/Home/Projects/boiler/web_app/lib/actions.js","reflux":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/index.js"}],"/Volumes/Home/Projects/boiler/web_app/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -28674,4 +28762,488 @@ module.exports = warning;
 },{"./emptyFunction":"/Volumes/Home/Projects/boiler/web_app/node_modules/react/lib/emptyFunction.js","_process":"/Volumes/Home/Projects/boiler/web_app/node_modules/browserify/node_modules/process/browser.js"}],"/Volumes/Home/Projects/boiler/web_app/node_modules/react/react.js":[function(require,module,exports){
 module.exports = require('./lib/React');
 
-},{"./lib/React":"/Volumes/Home/Projects/boiler/web_app/node_modules/react/lib/React.js"}]},{},["./lib/main.js"]);
+},{"./lib/React":"/Volumes/Home/Projects/boiler/web_app/node_modules/react/lib/React.js"}],"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/node_modules/eventemitter3/index.js":[function(require,module,exports){
+'use strict';
+
+/**
+ * Minimal EventEmitter interface that is molded against the Node.js
+ * EventEmitter interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = {};
+}
+
+/**
+ * Return a list of assigned event listeners.
+ *
+ * @param {String} event The events that should be listed.
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event) {
+  return Array.apply(this, this._events[event] || []);
+};
+
+/**
+ * Emit an event to all registered event listeners.
+ *
+ * @param {String} event The name of the event.
+ * @returns {Boolean} Indication if we've emitted an event.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  if (!this._events || !this._events[event]) return false;
+
+  var listeners = this._events[event]
+    , length = listeners.length
+    , len = arguments.length
+    , fn = listeners[0]
+    , args
+    , i;
+
+  if (1 === length) {
+    if (fn.__EE3_once) this.removeListener(event, fn);
+
+    switch (len) {
+      case 1:
+        fn.call(fn.__EE3_context || this);
+      break;
+      case 2:
+        fn.call(fn.__EE3_context || this, a1);
+      break;
+      case 3:
+        fn.call(fn.__EE3_context || this, a1, a2);
+      break;
+      case 4:
+        fn.call(fn.__EE3_context || this, a1, a2, a3);
+      break;
+      case 5:
+        fn.call(fn.__EE3_context || this, a1, a2, a3, a4);
+      break;
+      case 6:
+        fn.call(fn.__EE3_context || this, a1, a2, a3, a4, a5);
+      break;
+
+      default:
+        for (i = 1, args = new Array(len -1); i < len; i++) {
+          args[i - 1] = arguments[i];
+        }
+
+        fn.apply(fn.__EE3_context || this, args);
+    }
+  } else {
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    for (i = 0; i < length; fn = listeners[++i]) {
+      if (fn.__EE3_once) this.removeListener(event, fn);
+      fn.apply(fn.__EE3_context || this, args);
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Register a new EventListener for the given event.
+ *
+ * @param {String} event Name of the event.
+ * @param {Functon} fn Callback function.
+ * @param {Mixed} context The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  if (!this._events) this._events = {};
+  if (!this._events[event]) this._events[event] = [];
+
+  fn.__EE3_context = context;
+  this._events[event].push(fn);
+
+  return this;
+};
+
+/**
+ * Add an EventListener that's only called once.
+ *
+ * @param {String} event Name of the event.
+ * @param {Function} fn Callback function.
+ * @param {Mixed} context The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  fn.__EE3_once = true;
+  return this.on(event, fn, context);
+};
+
+/**
+ * Remove event listeners.
+ *
+ * @param {String} event The event we want to remove.
+ * @param {Function} fn The listener that we need to find.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn) {
+  if (!this._events || !this._events[event]) return this;
+
+  var listeners = this._events[event]
+    , events = [];
+
+  for (var i = 0, length = listeners.length; i < length; i++) {
+    if (fn && listeners[i] !== fn) {
+      events.push(listeners[i]);
+    }
+  }
+
+  //
+  // Reset the array, or remove it completely if we have no more listeners.
+  //
+  if (events.length) this._events[event] = events;
+  else this._events[event] = null;
+
+  return this;
+};
+
+/**
+ * Remove all listeners or only the listeners for the specified event.
+ *
+ * @param {String} event The event want to remove all listeners for.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  if (!this._events) return this;
+
+  if (event) this._events[event] = null;
+  else this._events = {};
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the module.
+//
+EventEmitter.EventEmitter = EventEmitter;
+EventEmitter.EventEmitter2 = EventEmitter;
+EventEmitter.EventEmitter3 = EventEmitter;
+
+try { module.exports = EventEmitter; }
+catch (e) {}
+
+},{}],"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/ListenerMixin.js":[function(require,module,exports){
+module.exports = {
+
+    /**
+     * Set up the mixin before the initial rendering occurs. Event listeners
+     * and callbacks should be registered once the component successfully
+     * mounted (as described in the React docs).
+     */
+    componentWillMount: function() {
+        this.subscriptions = [];
+    },
+
+
+    /**
+     * Subscribes the given callback for action triggered
+     *
+     * @param {Action|Store} listenable An Action or Store that should be
+     *  listened to.
+     * @param {Function} callback The callback to register as event handler
+     */
+    listenTo: function(listenable, callback) {
+        var unsubscribe = listenable.listen(callback, this);
+        this.subscriptions.push(unsubscribe);
+    },
+
+    componentWillUnmount: function() {
+        this.subscriptions.forEach(function(unsubscribe) {
+            unsubscribe();
+        });
+        this.subscriptions = [];
+    }
+};
+
+},{}],"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/all.js":[function(require,module,exports){
+var createAction = require('./createAction');
+
+var slice = Array.prototype.slice;
+
+/**
+ * Track a set of Actions and Stores. Use Reflux.all if you need to handle
+ * data coming in parallel.
+ *
+ * @param {...Action|Store} listenables Actions and Stores that should be
+ *  tracked.
+ * @returns {Action} An action which tracks the provided Actions and Stores.
+ *  The action will emit once all of the provided listenables have emitted at
+ *  least once.
+ */
+module.exports = function(/* listenables... */) {
+    var numberOfListenables = arguments.length,
+        // create a new array of the expected size. The initial
+        // values will be falsy, which is fine for us.
+        // Once each item in the array is truthy, the callback can be called
+        listenablesEmitted,
+        // these arguments will be used to *apply* the action.
+        args,
+        // this action combines all the listenables
+        action = createAction();
+
+    action.hasListener = function(listenable) {
+        var i = 0, listener;
+
+        for (; i < args.length; ++i) {
+            listener = args[i];
+            if (listener === listenable || listener.hasListener && listener.hasListener(listenable)) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    reset();
+
+    for (var i = 0; i < numberOfListenables; i++) {
+        arguments[i].listen(newListener(i), null);
+    }
+
+    return action;
+
+    function reset() {
+        listenablesEmitted = new Array(numberOfListenables);
+        args = new Array(numberOfListenables);
+    }
+
+    function newListener(i) {
+        return function() {
+            listenablesEmitted[i] = true;
+            // Reflux users should not need to care about Array and arguments
+            // differences. This makes sure that they get the expected Array
+            // interface
+            args[i] = slice.call(arguments);
+            emitWhenAllListenablesEmitted();
+        };
+    }
+
+    function emitWhenAllListenablesEmitted() {
+        if (didAllListenablesEmit()) {
+            action.apply(action, args);
+            reset();
+        }
+    }
+
+    function didAllListenablesEmit() {
+        // reduce cannot be used because it only iterates over *present*
+        // elements in the array. Initially the Array doesn't contain
+        // elements. For this reason the usage of reduce would always indicate
+        // that all listenables emitted.
+        for (var i = 0; i < numberOfListenables; i++) {
+            if (!listenablesEmitted[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
+},{"./createAction":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/createAction.js"}],"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/createAction.js":[function(require,module,exports){
+var _ = require('./utils');
+
+/**
+ * Creates an action functor object
+ */
+module.exports = function() {
+
+    var action = new _.EventEmitter(),
+        eventLabel = "action",
+        functor;
+
+    functor = function() {
+        var args = arguments;
+        _.nextTick(function() {
+            functor.preEmit.apply(functor, args);
+            if (functor.shouldEmit.apply(functor, args)) {
+                action.emit(eventLabel, args);
+            }
+        });
+    };
+
+    /**
+     * Subscribes the given callback for action triggered
+     *
+     * @param {Function} callback The callback to register as event handler
+     * @param {Mixed} [optional] bindContext The context to bind the callback with
+     * @returns {Function} Callback that unsubscribes the registered event handler
+     */
+    functor.listen = function(callback, bindContext) {
+        var eventHandler = function(args) {
+            callback.apply(bindContext, args);
+        };
+        action.addListener(eventLabel, eventHandler);
+
+        return function() {
+            action.removeListener(eventLabel, eventHandler);
+        };
+    };
+
+    /**
+     * Hook used by the action functor that is invoked before emitting
+     * and before `shouldEmit`. The arguments are the ones that the action
+     * is invoked with.
+     */
+    functor.preEmit = function() {};
+
+    /**
+     * Hook used by the action functor after `preEmit` to determine if the
+     * event should be emitted with given arguments. This may be overridden
+     * in your application, default implementation always returns true.
+     *
+     * @returns {Boolean} true if event should be emitted
+     */
+    functor.shouldEmit = function() { return true; };
+
+    return functor;
+
+};
+
+},{"./utils":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/utils.js"}],"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/createStore.js":[function(require,module,exports){
+var _ = require('./utils');
+
+/**
+ * Creates an event emitting Data Store
+ *
+ * @param {Object} definition The data store object definition
+ */
+module.exports = function(definition) {
+    var store = new _.EventEmitter(),
+        eventLabel = "change";
+
+    function Store() {
+        this.registered = [];
+        if (this.init && _.isFunction(this.init)) {
+            this.init();
+        }
+    }
+    _.extend(Store.prototype, definition);
+    Store.prototype.listenTo = function(listenable, callback) {
+        if (listenable === this) {
+            throw Error("Store is not able to listen to itself");
+        }
+        if (!_.isFunction(listenable.listen)) {
+            throw new TypeError(listenable + " is missing a listen method");
+        }
+        if (this.hasListener(listenable)) {
+            throw Error("Store cannot listen to this listenable because of circular loop");
+        }
+        this.registered.push(listenable);
+        return listenable.listen(callback, this);
+    };
+    Store.prototype.listen = function(callback, bindContext) {
+        var eventHandler = function(args) {
+            callback.apply(bindContext, args);
+        };
+        eventHandler.l = callback;
+        store.addListener(eventLabel, eventHandler);
+
+        return function() {
+            store.removeListener(eventLabel, eventHandler);
+        };
+    };
+    Store.prototype.trigger = function() {
+        store.emit(eventLabel, arguments);
+    };
+    Store.prototype.hasListener = function(listenable) {
+        var i = 0,
+            listener;
+
+        for (;i < this.registered.length; ++i) {
+            listener = this.registered[i];
+            if (listener === listenable || listener.hasListener && listener.hasListener(listenable)) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    return new Store();
+};
+
+},{"./utils":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/utils.js"}],"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/index.js":[function(require,module,exports){
+exports.createAction = require('./createAction');
+
+exports.createStore = require('./createStore');
+
+exports.ListenerMixin = require('./ListenerMixin');
+
+exports.all = require('./all');
+
+exports.createActions = function(actionNames) {
+    var i = 0, actions = {};
+    for (; i < actionNames.length; i++) {
+        actions[actionNames[i]] = exports.createAction();
+    }
+    return actions;
+};
+
+exports.setEventEmitter = function(ctx) {
+    var _ = require('./utils');
+    _.EventEmitter = ctx;
+};
+
+exports.nextTick = function(nextTick) {
+    var _ = require('./utils');
+    _.nextTick = nextTick;
+};
+
+},{"./ListenerMixin":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/ListenerMixin.js","./all":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/all.js","./createAction":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/createAction.js","./createStore":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/createStore.js","./utils":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/utils.js"}],"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/src/utils.js":[function(require,module,exports){
+/*
+ * isObject, extend and isFunction are taken from undescore/lodash in
+ * order to remove the dependency
+ */
+
+var isObject = module.exports.isObject = function(obj) {
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
+};
+
+module.exports.extend = function(obj) {
+    if (!isObject(obj)) {
+        return obj;
+    }
+    var source, prop;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+        source = arguments[i];
+        for (prop in source) {
+            obj[prop] = source[prop];
+        }
+    }
+    return obj;
+};
+
+module.exports.isFunction = function(value) {
+    return typeof value === 'function';
+};
+
+module.exports.EventEmitter = require('eventemitter3');
+module.exports.nextTick = function(callback) {
+    setTimeout(callback, 0);
+};
+
+},{"eventemitter3":"/Volumes/Home/Projects/boiler/web_app/node_modules/reflux/node_modules/eventemitter3/index.js"}]},{},["./lib/main.js"]);
