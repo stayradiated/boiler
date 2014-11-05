@@ -22,7 +22,7 @@ describe('Header', function () {
     expect(h1.getDOMNode().textContent).toBe('test');
   });
 
-  it('calls onChangeName whin button is clicked', function () {
+  it('calls onChangeName when button is clicked', function () {
     var button = TestUtils.findRenderedDOMComponentWithTag(header, 'button');
     TestUtils.Simulate.click(button);
     expect(callback.mock.calls.length).toBe(1);
