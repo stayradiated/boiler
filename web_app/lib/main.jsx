@@ -16,14 +16,7 @@ $(function () {
     AppStore: new AppStore({ name: 'Boiler' }),
   };
 
-  console.log(stores, actions);
-
   var flux = new Fluxxor.Flux(stores, actions);
-
-  flux.on('dispatch', function (type, payload) {
-    console.log('[Dispatch]', type, payload);
-  });
-
   React.renderComponent(<App flux={flux} />, document.body);
 });
 
