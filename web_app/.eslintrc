@@ -1,0 +1,16 @@
+{
+    "env": {
+      "browser": true,
+      "es6": true,
+      "node": true
+    },
+    "plugins": [ "react" ],
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "rules": {
+      "comma-dangle": "always-multiline",
+      "no-multi-spaces": 0,
+      "key-spacing": 0
+    }
+}

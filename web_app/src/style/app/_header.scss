@@ -1,0 +1,37 @@
+.component--header {
+
+    background: #eee;
+    border-bottom: 10px;
+    padding: 20px;
+
+    $height: 20px;
+
+    h1 {
+        float: left;
+        font-size: 20px;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    button {
+        $bg: #3498db;
+
+        float: right;
+        border: 0;
+        outline: 0;
+        color: #fff;
+        background: $bg;
+        padding: 10px;
+        border-radius: 3px;
+
+        &:hover {
+            background: lighten($bg, 5);
+        }
+    }
+
+    &:after {
+        content: '';
+        display: table;
+        clear: both;
+    }
+}
